@@ -1,7 +1,7 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let rsBtn = document.getElementById("reset");
-rsBtn.disabled = true;
+rsBtn.disabled = false;
 
 let paddleSpeed = 6;
 let paddleWidth = 100;
@@ -16,6 +16,8 @@ let dy = 2;
 let score = 0;
 let count = 0;
 let posRelativePaddle = 0;
+let mySound;
+let mySoundEnd;
 
 const BOTTOM = 40;
 const PADDLE_HEIGHT = 6;
@@ -31,6 +33,28 @@ setInterval(function () {
         count = 0;
     }
 }, 1000);
+
+function start_screen () {
+    mySound = new Sound("ball_cutted.mp3");
+    mySoundEnd = new Sound("FINISH HIM _ Sound Effect.mp3");
+    myBall.drawBall();
+    myPaddle.drawPaddle();
+}
+
+let Sound = function (src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.playSound = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }
+}
 
 let myBall = {
     ballX: 21,
@@ -49,37 +73,45 @@ let myBall = {
         this.ballY += dy;
         if (this.ballX + dx < this.ballRadius || this.ballX + dx > canvas.width - this.ballRadius) {
             dx = -dx;
+            mySound.playSound();
         }
         if (this.ballY + dy < this.ballRadius) {
             dy = -dy;
+            mySound.playSound();
         }
         if (dx > 0) {
             if (this.ballX + dx + this.ballRadius > myPaddle.paddleX && this.ballX + dx - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dy = -dy;
+                mySound.playSound();
             }
             if (this.ballX + dx + this.ballRadius > myPaddle.paddleX && this.ballX + this.ballRadius < myPaddle.paddleX &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight - this.ballRadius && this.ballY + dy < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dx = -dx;
                 dy = -dy;
+                mySound.playSound();
             }
             if (this.ballX + dx < myPaddle.paddleX && this.ballX + dx + this.ballRadius > myPaddle.paddleX &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY + dy < canvas.height - BOTTOM + this.ballRadius) {
                 dx = -dx;
+                mySound.playSound();
             }
         } else if (dx < 0) {
             if (this.ballX - dx + this.ballRadius > myPaddle.paddleX && this.ballX - dx - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dy = -dy;
+                mySound.playSound();
             }
             if (this.ballX - dx - this.ballRadius > myPaddle.paddleX + myPaddle.paddleWidth && this.ballX - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight - this.ballRadius && this.ballY + dy < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dx = -dx;
                 dy = -dy;
+                mySound.playSound();
             }
             if (this.ballX - dx - this.ballRadius > myPaddle.paddleX + myPaddle.paddleWidth && this.ballX - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY + dy < canvas.height - BOTTOM + this.ballRadius) {
                 dx = -dx;
+                mySound.playSound();
             }
         }
     },
@@ -88,6 +120,7 @@ let myBall = {
         if (this.ballY + dy > canvas.height - this.ballRadius) {
             isGameOver = true;
             rsBtn.disabled = false;
+            mySoundEnd.playSound();
         }
     },
 
@@ -103,7 +136,7 @@ document.addEventListener("keydown", function () {
     if (event.keyCode === 37) {
         isMovingLeft = true;
     }
-    if (event.keyCode === 39) {
+    if (event.keyCode === 39) {        //e.key === "Right" || e.key === "ArrowRight"
         isMovingRight = true;
     }
 });
@@ -168,14 +201,11 @@ function animate() {
         myPaddle.changePaddlePosition();
         myBall.checkGameOver();
         myBall.showPoint();
-
         requestAnimationFrame(animate);
     } else {
         alert("Want to play again? Click Play button");
     }
 }
-
-animate();
 
 function resetHandle() {
     isGameOver = false;
