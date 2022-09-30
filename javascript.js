@@ -1,5 +1,7 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+let rsBtn = document.getElementById("reset");
+rsBtn.disabled = true;
 
 let paddleSpeed = 6;
 let paddleWidth = 100;
@@ -13,18 +15,19 @@ let dx = -4;
 let dy = 2;
 let score = 0;
 let count = 0;
+let posRelativePaddle = 0;
 
 const BOTTOM = 40;
 const PADDLE_HEIGHT = 6;
 
 setInterval(function () {
-    score ++;
-    count ++
+    score++;
+    count++
     if (count >= 10) {
         speed += 0.3;
         dx = dx * speed;
         dy = dy * speed;
-        paddleSpeed ++;
+        paddleSpeed++;
         count = 0;
     }
 }, 1000);
@@ -59,36 +62,32 @@ let myBall = {
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight - this.ballRadius && this.ballY + dy < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dx = -dx;
                 dy = -dy;
-                console.log("2");
             }
             if (this.ballX + dx < myPaddle.paddleX && this.ballX + dx + this.ballRadius > myPaddle.paddleX &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY + dy < canvas.height - BOTTOM + this.ballRadius) {
                 dx = -dx;
-                console.log("5");
-            } //this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY < canvas.height - BOTTOM - myPaddle.paddleHeight
-        } else if (dx < 0) { //this.ballX - dx + this.ballRadius > myPaddle.paddleX && this.ballX - dx - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
+            }
+        } else if (dx < 0) {
             if (this.ballX - dx + this.ballRadius > myPaddle.paddleX && this.ballX - dx - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dy = -dy;
-                console.log("3");
             }
             if (this.ballX - dx - this.ballRadius > myPaddle.paddleX + myPaddle.paddleWidth && this.ballX - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight - this.ballRadius && this.ballY + dy < canvas.height - BOTTOM - myPaddle.paddleHeight) {
                 dx = -dx;
                 dy = -dy;
-                console.log("4");
             }
             if (this.ballX - dx - this.ballRadius > myPaddle.paddleX + myPaddle.paddleWidth && this.ballX - this.ballRadius < myPaddle.paddleX + myPaddle.paddleWidth &&
                 this.ballY + dy > canvas.height - BOTTOM - myPaddle.paddleHeight && this.ballY + dy < canvas.height - BOTTOM + this.ballRadius) {
                 dx = -dx;
-                console.log("6");
             }
         }
     },
 
     checkGameOver: function () {
-        if (this.ballY > canvas.height - this.ballRadius) {
+        if (this.ballY + dy > canvas.height - this.ballRadius) {
             isGameOver = true;
+            rsBtn.disabled = false;
         }
     },
 
@@ -118,6 +117,16 @@ document.addEventListener("keyup", function () {
     }
 });
 
+document.addEventListener("mousemove", function (e) {
+    posRelativePaddle = e.clientX - canvas.offsetLeft;
+    myPaddle.paddleX = posRelativePaddle - myPaddle.paddleWidth / 2;
+    if (myPaddle.paddleX < 0) {
+        myPaddle.paddleX = 0;
+    }
+    if (myPaddle.paddleX > canvas.width - myPaddle.paddleWidth){
+        myPaddle.paddleX = canvas.width - myPaddle.paddleWidth;
+    }
+});
 
 let myPaddle = {
     paddleWidth: paddleWidth,
@@ -138,16 +147,16 @@ let myPaddle = {
             } else {
                 this.paddleX -= paddleSpeed;
             }
-        }
-        if (isMovingRight) {
+        } else if (isMovingRight) {
             if (this.paddleX + paddleSpeed > canvas.width - this.paddleWidth) {
                 this.paddleX = canvas.width - this.paddleWidth;
             } else {
                 this.paddleX += paddleSpeed;
             }
-        }
-    }
+        } else {
 
+        }
+    },
 }
 
 function animate() {
@@ -162,8 +171,23 @@ function animate() {
 
         requestAnimationFrame(animate);
     } else {
-        alert("Again?");
+        alert("Want to play again? Click Play button");
     }
 }
 
 animate();
+
+function resetHandle() {
+    isGameOver = false;
+    myBall.ballX = 21;
+    myBall.ballY = 21;
+    xPaddle = 0;
+    speed = 1;
+    dx = -4;
+    dy = 2;
+    score = 0;
+    count = 0;
+    posRelativePaddle = 0;
+    rsBtn.disabled = true;
+    animate();
+}
