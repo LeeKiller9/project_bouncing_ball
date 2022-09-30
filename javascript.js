@@ -35,7 +35,7 @@ setInterval(function () {
 }, 1000);
 
 function start_screen () {
-    mySound = new Sound("ball_cutted.mp3");
+    mySound = new Sound("ball_cut.mp3");
     mySoundEnd = new Sound("FINISH HIM _ Sound Effect.mp3");
     myBall.drawBall();
     myPaddle.drawPaddle();
@@ -219,5 +219,8 @@ function resetHandle() {
     count = 0;
     posRelativePaddle = 0;
     rsBtn.disabled = true;
+    paddleSpeed = 6;
+    paddleWidth = 100;
+    radius = 8;
     animate();
 }
